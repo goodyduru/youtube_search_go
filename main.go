@@ -1,4 +1,4 @@
-package youtube_search
+package youtubesearch
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type youtubeResponse struct {
@@ -39,7 +40,9 @@ type VideoData struct {
 const MAX_RESULTS = 10
 const BASE_URL = "https://youtube.com"
 
-func Search(query string) ([]VideoData, error) {
+func Search(query string, timeout time.Duration) ([]VideoData, error) {
+	var res []byte
+	done := make(chan struct{})
 	v := url.Values{}
 	v.Add("search_query", query)
 	url := fmt.Sprintf("%s/results?%s", BASE_URL, v.Encode())
@@ -47,7 +50,20 @@ func Search(query string) ([]VideoData, error) {
 	if err != nil {
 		return nil, err
 	}
-	res, err := search(req)
+	if timeout > 0 {
+		go func() {
+			res, err = search(req)
+			done <- struct{}{}
+		}()
+		select {
+		case <-done:
+			break
+		case <-time.After(timeout):
+			return nil, fmt.Errorf("failed to perform search in time. Please try again")
+		}
+	} else {
+		res, err = search(req)
+	}
 	if err != nil {
 		return nil, err
 	}
