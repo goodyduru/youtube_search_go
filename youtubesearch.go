@@ -25,21 +25,28 @@ type contents struct {
 	} `json:"twoColumnSearchResultsRenderer"`
 }
 
+// Structure of a youtube video search result.
 type VideoData struct {
-	ID          string
-	Thumbnails  []string
-	Title       string
-	LongDesc    string
-	Channel     string
-	Duration    string
-	Views       string
-	PublishTime string
-	URLSuffix   string
+	ID          string   // Youtube ID for the Video
+	Thumbnails  []string // List of urls for the video thumbnails
+	Title       string   // Title of the video.
+	LongDesc    string   // Description of the video.
+	Channel     string   // ID of the channel that posted the video.
+	Duration    string   // Duration of the video.
+	Views       string   // Number of views the video has.
+	PublishTime string   // Time since the video was published e.g 7 years ago.
+	URLSuffix   string   // URL path and query for the video. Meant to be concatenated with "https://youtube.com"
 }
 
 const MAX_RESULTS = 10
 const BASE_URL = "https://youtube.com"
 
+// Search executes a search request to youtube to retrieve video results.
+// The results are returned based on the query. The timeout (in nanoseconds)
+// determines the maximum time this function should execute. If the taken exceeds
+// the timeout, the request is cancelled and an error is returned. It is assumed
+// that there is no timeout when the timeout parameter is set to zero or a negative
+// number.
 func Search(query string, timeout time.Duration) ([]VideoData, error) {
 	var res []byte
 	done := make(chan struct{})
