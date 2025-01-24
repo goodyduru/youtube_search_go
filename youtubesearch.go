@@ -38,9 +38,6 @@ type VideoData struct {
 	URLSuffix   string   // URL path and query for the video. Meant to be concatenated with "https://youtube.com"
 }
 
-const MAX_RESULTS = 10
-const BASE_URL = "https://youtube.com"
-
 // Search executes a search request to youtube to retrieve video results.
 // The results are returned based on the query. The timeout (in nanoseconds)
 // determines the maximum time this function should execute. If the taken exceeds
@@ -49,10 +46,11 @@ const BASE_URL = "https://youtube.com"
 // number.
 func Search(query string, timeout time.Duration) ([]VideoData, error) {
 	var res []byte
+	const base_url = "https://youtube.com"
 	done := make(chan struct{})
 	v := url.Values{}
 	v.Add("search_query", query)
-	url := fmt.Sprintf("%s/results?%s", BASE_URL, v.Encode())
+	url := fmt.Sprintf("%s/results?%s", base_url, v.Encode())
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
