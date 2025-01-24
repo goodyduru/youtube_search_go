@@ -1,6 +1,5 @@
 # youtubesearch
-Inspired by the [youtube_search Python package](https://github.com/joetats/youtube_search). This library allows you to search for 
-youtube videos without using the API.
+Inspired by the youtube_search [Python library](https://github.com/joetats/youtube_search). This library allows you to search for youtube videos without using the API.
 
 # Example
 ```go
