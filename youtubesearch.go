@@ -72,7 +72,10 @@ func Search(query string, timeout time.Duration) ([]VideoData, error) {
 	if err != nil {
 		return nil, err
 	}
-	results := parseResponse(res)
+	results, err := parseResponse(res)
+	if err != nil {
+		return nil, err
+	}
 	return results, nil
 }
 
@@ -102,14 +105,14 @@ func search(request *http.Request) ([]byte, error) {
 	}
 }
 
-func parseResponse(response []byte) []VideoData {
+func parseResponse(response []byte) ([]VideoData, error) {
 	data := make(map[string]json.RawMessage)
 	if err := json.Unmarshal(response, &data); err != nil {
-		panic(err)
+		return nil, err
 	}
 	var yt youtubeResponse
 	if err := json.Unmarshal(data["contents"], &yt.Contents); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	var result []VideoData
@@ -131,7 +134,7 @@ func parseResponse(response []byte) []VideoData {
 			result = append(result, videoData)
 		}
 	}
-	return result
+	return result, nil
 }
 
 func parseItem(item map[string]interface{}) VideoData {
